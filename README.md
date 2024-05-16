@@ -104,3 +104,66 @@
 
  }
 ```
+
+```private void RequisiteTextBox_KeyPress(object sender, KeyPressEventArgs e)
+{
+    if (e.KeyChar == (char)Keys.Enter)
+    {
+        OleDbConnection thisConnection = new OleDbConnection(connectionString);
+        thisConnection.Open();
+        OleDbCommand thisCommand = thisConnection.CreateCommand();
+
+        OleDbCommand thisCommandPreq = thisConnection.CreateCommand();
+        string sqlP = "SELECT * FROM SUBJECTPREQFILE";
+        thisCommandPreq.CommandText = sqlP;
+
+        string sql = "SELECT * FROM SUBJECTFILE";
+        thisCommand.CommandText = sql;
+
+        OleDbDataReader thisDataReader = thisCommand.ExecuteReader();
+        OleDbDataReader thisDataReaderP = thisCommandPreq.ExecuteReader();
+
+
+        bool found = false;
+        string subjectCode = "";
+        string description = "";
+        string units = "";
+        string requisite = "";
+
+        while (thisDataReader.Read())
+        {
+            // MessageBox.Show(thisDataReader["SFSUBJCODE"].ToString());
+            if (thisDataReader["SFSUBJCODE"].ToString().Trim().ToUpper() == RequisiteTextBox.Text.Trim().ToUpper())
+                
+            {
+                found = true;
+                subjectCode = thisDataReader["SFSUBJCODE"].ToString();
+                description = thisDataReader["SFSUBJDESC"].ToString();
+                units = thisDataReader["SFSUBJUNITS"].ToString();
+                break;
+                //
+            }
+
+        }
+        while (thisDataReaderP.Read()) {
+            if ((thisDataReaderP["SUBJCODE"].ToString().Trim().ToUpper() == RequisiteTextBox.Text.Trim().ToUpper())) { 
+                requisite = thisDataReaderP["SUBJPRECODE"].ToString();
+                break;
+            }
+        }
+
+        int index;
+        if (found == false)
+            MessageBox.Show("Subject Code Not Found");
+        else
+        {
+            index = SubjectDataGridView.Rows.Add();
+            SubjectDataGridView.Rows[index].Cells["SubjectCodeColumn"].Value = subjectCode;
+            SubjectDataGridView.Rows[index].Cells["DescriptionColumn"].Value = description;
+            SubjectDataGridView.Rows[index].Cells["UnitsColumn"].Value = units;
+            SubjectDataGridView.Rows[index].Cells["CoPreColumn"].Value = requisite;
+
+        }
+    }
+}
+```
